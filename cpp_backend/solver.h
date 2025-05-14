@@ -12,6 +12,7 @@ public:
     std::string solve();  // returns solved board as a string
 private:
     unsigned long long int scan_count = 0;
+    int dim;
 
     struct Tile {
         int n, e, s, w;
@@ -23,7 +24,6 @@ private:
         bool operator==(const Tile& other) const;
     };
 
-    int dim;
     std::vector<Tile> tiles;
 
     std::vector<Tile> parse_tiles(const std::string& tile_str);

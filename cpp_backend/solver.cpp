@@ -58,7 +58,7 @@ bool Solver::Tile::operator==(const Tile& other) const {
     return n == other.n && e == other.e && s == other.s && w == other.w;
 }
 
-Solver::Solver(const std::string& tile_str, int dim) : dim(dim), scan_count(0) {
+Solver::Solver(const std::string& tile_str, int dim) : scan_count(0), dim(dim) {
     tiles = parse_tiles(tile_str);
 }
 
