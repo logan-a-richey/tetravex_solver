@@ -10,6 +10,16 @@
 #include <ctime>
 #include <algorithm>
 #include <random>
+#include "solver.h"
+
+#include <iostream>
+#include <vector>
+#include <sstream>
+#include <cstdlib>
+#include <cmath>
+#include <ctime>
+#include <algorithm>
+#include <random>
 
 std::string format_number_with_commas(unsigned long long int n) {
     std::string result = "";
@@ -48,7 +58,7 @@ bool Solver::Tile::operator==(const Tile& other) const {
     return n == other.n && e == other.e && s == other.s && w == other.w;
 }
 
-Solver::Solver(const std::string& tile_str, int dim) : dim(dim) {
+Solver::Solver(const std::string& tile_str, int dim) : dim(dim), scan_count(0) {
     tiles = parse_tiles(tile_str);
 }
 
@@ -69,19 +79,19 @@ int Solver::calculate_cost(const std::vector<Tile>& t) {
             int idx = i * dim + j;
             const Tile& tile = t[idx];
 
-            if (i > 0 && tile.n != t[(i - 1) * dim + j].s){
+            if (i > 0 && tile.n != t[(i - 1) * dim + j].s) {
                 cost++;
                 scan_count++;
             }
-            if (j > 0 && tile.w != t[i * dim + (j - 1)].e){
+            if (j > 0 && tile.w != t[i * dim + (j - 1)].e) {
                 cost++;
                 scan_count++;
             }
-            if (i < dim - 1 && tile.s != t[(i + 1) * dim + j].n){
+            if (i < dim - 1 && tile.s != t[(i + 1) * dim + j].n) {
                 cost++;
                 scan_count++;
             }
-            if (j < dim - 1 && tile.e != t[i * dim + (j + 1)].w){
+            if (j < dim - 1 && tile.e != t[i * dim + (j + 1)].w) {
                 cost++;
                 scan_count++;
             }
@@ -176,4 +186,3 @@ std::string Solver::solve() {
 
     return result;
 }
-
