@@ -1,57 +1,64 @@
 // generator.cpp
 // code to generate a tetravex puzzle string
 
-#include <iostream>
+// generator.cpp
 #include "generator.h"
+#include <vector>
 #include <string>
-#include <cstdlib>
-#include <ctime>
+#include <random>
+#include <sstream>
+#include <iomanip>
+#include <algorithm>
 
 class Piece {
 public:
     int n, e, s, w;
 
-    std::string get_id() {
-        char buffer[5];
-        sprintf(buffer, "%d%d%d%d", n, e, s, w);
-        return std::string(buffer);
+    std::string get_id() const {
+        std::ostringstream oss;
+        oss << n << e << s << w;
+        return oss.str();
     }
 };
 
 std::string Generator::generate(int size) {
-    srand(static_cast<unsigned int>(time(0)));
+    using Board = std::vector<std::vector<Piece>>;
+    Board board(size, std::vector<Piece>(size));
 
-    Piece board[size][size];
-    std::string result;
+    // Random number generator
+    std::random_device rd;
+    std::mt19937 rng(rd());
+    std::uniform_int_distribution<int> digit(0, 9);
 
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
-            // Random values
-            board[i][j].n = rand() % 10;
-            board[i][j].e = rand() % 10;
-            board[i][j].s = rand() % 10;
-            board[i][j].w = rand() % 10;
+    // Generate a solved board with matching edges
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            Piece& p = board[i][j];
 
-            // Horizontal match (left neighbor)
-            if (j >= 1) {
-                board[i][j].w = board[i][j - 1].e;
-            }
+            // Default random values
+            p.n = digit(rng);
+            p.e = digit(rng);
+            p.s = digit(rng);
+            p.w = digit(rng);
 
-            // Vertical match (top neighbor)
-            if (i >= 1) {
-                board[i][j].n = board[i - 1][j].s;
-            }
+            if (j >= 1) p.w = board[i][j - 1].e;     // match west edge
+            if (i >= 1) p.n = board[i - 1][j].s;     // match north edge
         }
     }
 
-    // Build result string
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
-            std::string id = board[i][j].get_id();
-            result += id + " ";
-        }
-        result += "\n";
+    // Flatten board into a 1D vector for shuffling
+    std::vector<Piece> flat;
+    for (const auto& row : board)
+        flat.insert(flat.end(), row.begin(), row.end());
+
+    std::shuffle(flat.begin(), flat.end(), rng);
+
+    // Build final output string: "1234 5678 9012 ..."
+    std::ostringstream result;
+    for (size_t k = 0; k < flat.size(); ++k) {
+        result << flat[k].get_id();
+        if (k + 1 < flat.size()) result << ' ';
     }
 
-    return result;
+    return result.str();
 }
