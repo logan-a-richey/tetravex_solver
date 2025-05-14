@@ -1,26 +1,8 @@
-#ifndef PRETTYPRINTER_H
-#define PRETTYPRINTER_H
+// pretty_printer.cpp
 
-#include <string>
-#include <vector>
+#include "pretty_printer.h"
+#include "tile.h"
 
-class PrettyPrinter {
-public:
-    PrettyPrinter(int dim);
-    void print_board(const std::string& flat_string);
-
-private:
-    int dim;
-    struct Tile {
-        char n, e, s, w;
-        Tile(const std::string& str) : n(str[0]), e(str[1]), s(str[2]), w(str[3]) {}
-    };
-    std::string repeat(const std::string& s, int times);
-    void pretty_print_board(const std::string& flat_string);
-};
-
-#endif // PRETTYPRINTER_H
-#include "prettyprinter.h"
 #include <iostream>
 #include <sstream>
 
@@ -37,7 +19,7 @@ void PrettyPrinter::pretty_print_board(const std::string& flat_string) {
     std::string token;
     std::vector<std::vector<Tile>> board(dim, std::vector<Tile>(dim));
 
-    // Fill board from flat string
+    // fill board from flat string
     for (int i = 0; i < dim; ++i) {
         for (int j = 0; j < dim; ++j) {
             ss >> token;
@@ -49,31 +31,36 @@ void PrettyPrinter::pretty_print_board(const std::string& flat_string) {
     std::string divider = repeat("+---", dim) + "+\n";
 
     for (int i = 0; i < dim; ++i) {
-        output += repeat("+---", dim) + "+\n";  // Top border
+        // divider
+        output += repeat("+---", dim) + "+\n";
 
-        // Row 1: north
+        // row 1: north
         for (int j = 0; j < dim; ++j) {
             output += "| " + std::string(1, board[i][j].n) + " ";
         }
         output += "|\n";
 
-        // Row 2: west and east
+        // row 2: west and east
         for (int j = 0; j < dim; ++j) {
             output += "|" + std::string(1, board[i][j].w) + " " + std::string(1, board[i][j].e);
         }
         output += "|\n";
 
-        // Row 3: south
+        // row 3: south
         for (int j = 0; j < dim; ++j) {
             output += "| " + std::string(1, board[i][j].s) + " ";
         }
         output += "|\n";
     }
 
-    output += repeat("+---", dim) + "+\n";  // Final border
+    // add the final border
+    output += repeat("+---", dim) + "+\n";
+
+    // print the board string
     std::cout << output;
 }
 
 void PrettyPrinter::print_board(const std::string& flat_string) {
     pretty_print_board(flat_string);
 }
+

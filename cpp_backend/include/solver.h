@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "tile.h" // import <class Tile>
+
 class Solver {
 public:
     Solver(const std::string& tile_str, int dim);
@@ -14,16 +16,7 @@ private:
     unsigned long long int scan_count = 0;
     int dim;
 
-    struct Tile {
-        int n, e, s, w;
-        bool inPlace;
-
-        Tile(int n_, int e_, int s_, int w_) : n(n_), e(e_), s(s_), w(w_), inPlace(false) {}
-        Tile(const std::string& str);  // from string "1234"
-        std::string to_string() const;
-        bool operator==(const Tile& other) const;
-    };
-
+    // TODO fixme
     std::vector<Tile> tiles;
 
     std::vector<Tile> parse_tiles(const std::string& tile_str);
@@ -33,3 +26,4 @@ private:
 };
 
 #endif
+

@@ -1,3 +1,5 @@
+// generator.h
+
 #ifndef GENERATOR_H
 #define GENERATOR_H
 
@@ -5,7 +7,7 @@
 
 class Generator {
 public:
-    std::string generate(int size);
+    static std::string generate(int size);
 };
 
 #endif
