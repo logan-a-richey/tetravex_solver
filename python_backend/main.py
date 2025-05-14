@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 # main.py
 
-from puzzle_generator import PuzzleGenerator
-from puzzle_solver import PuzzleSolver
+from generator import Generator
+from solver import Solver
 
 def main():
     # create a puzzle
-    pg = PuzzleGenerator()
-    size = 6
+    pg = Generator()
+    size = 4
     puzzle = pg.generate(size=size)
     print(puzzle)
     
     # solve the puzzle
-    solver = PuzzleSolver(puzzle, dim=size)
+    solver = Solver(puzzle, dim=size)
     solver.solve()
 
     solver.print_board()

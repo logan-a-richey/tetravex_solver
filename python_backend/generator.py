@@ -15,7 +15,7 @@ class Piece:
     def get_string(self):
         return "{}{}{}{}".format(self.n, self.e, self.s, self.w)
 
-class PuzzleGenerator:
+class Generator:
     def __init__(self):
         self.board = []
 

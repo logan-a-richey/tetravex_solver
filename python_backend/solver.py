@@ -23,7 +23,7 @@ class Tile:
         return hash((self.n, self.e, self.s, self.w))
 
 
-class PuzzleSolver:
+class Solver:
     def __init__(self, tile_str, dim):
         self.dim = dim
         self.tiles = self.parse_tiles(tile_str)
