@@ -6,15 +6,30 @@ const colorMap = {
   7: '#FF00FF', 8: '#808080', 9: '#000000'
 };
 
-let tileData = [];
-let boardSize = 3;
+let boardSize = 2;
 
-function parseBoardString(str, size) {
-  const tokens = str.trim().split(/\s+/);
-  if (tokens.length !== size * size) return null;
-  return tokens.map(tile => tile.padStart(4, '0000').slice(0, 4));
+// Normalize each tile to exactly 4 digits (pad with '0')
+function normalizeTile(tileStr) {
+  const digits = tileStr.trim().replace(/[^0-9]/g, '');
+  return digits.padEnd(4, '0').slice(0, 4);
 }
 
+// Build a grid of tiles based on input
+function parseBoardInput(size, boardStr) {
+  const rawTiles = boardStr.trim().split(/\s+/);
+  let tiles = rawTiles.map(normalizeTile);
+
+  const totalTiles = size * size;
+  if (tiles.length < totalTiles) {
+    while (tiles.length < totalTiles) tiles.push('0000');
+  } else if (tiles.length > totalTiles) {
+    tiles = tiles.slice(0, totalTiles);
+  }
+
+  return tiles;
+}
+
+// Draw one board (input or solution)
 function drawBoard(canvasId, tiles, size) {
   const canvas = document.getElementById(canvasId);
   const ctx = canvas.getContext('2d');
@@ -27,71 +42,76 @@ function drawBoard(canvasId, tiles, size) {
     const x = col * tileSize;
     const y = row * tileSize;
 
-    // Draw 4 triangles NESW
     const cx = x + tileSize / 2;
     const cy = y + tileSize / 2;
     const r = tileSize;
 
-    const edges = ['N', 'E', 'S', 'W'];
-    const points = {
+    const dirs = ['N', 'E', 'S', 'W'];
+    const tris = {
       N: [[x, y], [x + r, y], [cx, cy]],
       E: [[x + r, y], [x + r, y + r], [cx, cy]],
       S: [[x, y + r], [x + r, y + r], [cx, cy]],
-      W: [[x, y], [x, y + r], [cx, cy]],
+      W: [[x, y], [x, y + r], [cx, cy]]
     };
 
-    edges.forEach((dir, i) => {
+    dirs.forEach((dir, i) => {
       const val = parseInt(tile[i]);
       ctx.fillStyle = colorMap[val] || '#CCCCCC';
+      const t = tris[dir];
       ctx.beginPath();
-      const tri = points[dir];
-      ctx.moveTo(tri[0][0], tri[0][1]);
-      ctx.lineTo(tri[1][0], tri[1][1]);
-      ctx.lineTo(tri[2][0], tri[2][1]);
+      ctx.moveTo(...t[0]);
+      ctx.lineTo(...t[1]);
+      ctx.lineTo(...t[2]);
       ctx.closePath();
       ctx.fill();
 
-      // Draw text
-      ctx.fillStyle = '#000000';
-      ctx.font = `${tileSize / 6}px sans-serif`;
-      const tx = (tri[0][0] + tri[1][0] + tri[2][0]) / 3;
-      const ty = (tri[0][1] + tri[1][1] + tri[2][1]) / 3 + 4;
-      ctx.fillText(tile[i], tx - 4, ty);
+      ctx.fillStyle = '#000';
+      ctx.font = `${tileSize / 5}px sans-serif`;
+      const tx = (t[0][0] + t[1][0] + t[2][0]) / 3;
+      const ty = (t[0][1] + t[1][1] + t[2][1]) / 3 + 4;
+      ctx.fillText(tile[i], tx - 5, ty);
     });
 
-    ctx.strokeStyle = '#000000';
+    ctx.strokeStyle = '#000';
     ctx.strokeRect(x, y, tileSize, tileSize);
   });
 }
 
-document.getElementById("boardString").addEventListener("input", () => {
-  boardSize = parseInt(document.getElementById("boardSize").value);
-  const tiles = parseBoardString(document.getElementById("boardString").value, boardSize);
-  if (tiles) {
-    tileData = tiles;
-    drawBoard("inputBoard", tileData, boardSize);
-  }
-});
+// Hook up live input
+function updateInputBoard() {
+  boardSize = parseInt(document.getElementById("boardSize").value) || 2;
+  const boardStr = document.getElementById("boardString").value;
+  const tiles = parseBoardInput(boardSize, boardStr);
+  drawBoard("inputBoard", tiles, boardSize);
+}
 
+document.getElementById("boardString").addEventListener("input", updateInputBoard);
+document.getElementById("boardSize").addEventListener("input", updateInputBoard);
+
+// Solve button
 async function solve() {
-  const boardString = document.getElementById("boardString").value;
   const size = parseInt(document.getElementById("boardSize").value);
+  const boardStr = document.getElementById("boardString").value;
+
   const res = await fetch("http://localhost:5000/solve", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ board_size: size, board_string: boardString })
+    body: JSON.stringify({ board_size: size, board_string: boardStr })
   });
 
   const data = await res.json();
   if (data.solution) {
     const lines = data.solution.trim().split('\n');
-    const solutionTiles = lines.map(line => line.trim()).filter(line => /^[0-9]{4}$/.test(line));
-    drawBoard("solutionBoard", solutionTiles, size);
+    const tiles = lines.filter(line => /^[0-9]{4}$/.test(line));
+    drawBoard("solutionBoard", tiles, size);
 
-    const metaLine = lines.find(line => line.includes("solved in")) || "";
-    document.getElementById("solutionStats").textContent = metaLine;
+    const meta = lines.find(line => line.includes('solved in')) || '';
+    document.getElementById("solutionStats").textContent = meta;
   } else {
-    document.getElementById("solutionStats").textContent = data.error || "Failed to solve.";
+    document.getElementById("solutionStats").textContent = data.error || "Solve failed.";
   }
 }
+
+// Initial render
+window.onload = updateInputBoard;
 
