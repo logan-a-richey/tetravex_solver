@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<!-- tetravex_solve.html -->
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tetravex Edit and Solve</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="tetravex_solve.js" defer></script>
+</head>
+<body>
+  <h1>Tetravex Edit and Solve</h1>
+
+  <label>Board Size (2-10): <input id="boardSize" type="number" min="2" max="10" value="3"></label><br>
+  <label>Board String: <input id="boardString" type="text" size="80"></label><br>
+
+  <h2>Input Board</h2>
+  <canvas id="inputBoard" width="300" height="300"></canvas><br>
+
+  <button onclick="solve()">Solve</button><br>
+
+  <h2>Solution</h2>
+  <canvas id="solutionBoard" width="300" height="300"></canvas><br>
+  <pre id="solutionStats"></pre>
+</body>
+</html>
