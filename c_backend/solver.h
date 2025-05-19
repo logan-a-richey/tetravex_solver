@@ -5,7 +5,6 @@
 
 #include "tile.h"
 
-char* solve_tetravex(Tile* tiles, int dim);
+char* solve_tetravex(Tile* tiles, const int dim);
 
 #endif
-

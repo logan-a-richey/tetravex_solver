@@ -10,10 +10,10 @@
 #include "solver.h"
 
 // keep track of number of positions scanned
-int positions_scanned = 0;
+static int positions_scanned = 0;
 
 // cost: number of mismatches
-int calculate_cost(Tile* t, int dim) {
+static int calculate_cost(Tile* t, int dim) {
     int cost = 0;
     for (int i = 0; i < dim; i++) {
         for (int j = 0; j < dim; j++) {
@@ -41,17 +41,19 @@ int calculate_cost(Tile* t, int dim) {
     return cost;
 }
 
-void transition(Tile* t, int dim) {
-    int total = dim * dim;
+static void transition(Tile* t, int dim) {
+    const int total = dim * dim;
     int i = rand() % total;
     int j = rand() % total;
-    while (j == i) j = rand() % total;
+    while (j == i) {
+        j = rand() % total;
+    }
     Tile tmp = t[i];
     t[i] = t[j];
     t[j] = tmp;
 }
 
-double init_temperature(Tile* tiles, int dim, int samples, double eps) {
+static double init_temperature(Tile* tiles, int dim, int samples, double eps) {
     double T1 = 0.0, T2 = 1e6, T;
     Tile* copy = malloc(sizeof(Tile) * dim * dim);
     memcpy(copy, tiles, sizeof(Tile) * dim * dim);
@@ -92,12 +94,12 @@ double init_temperature(Tile* tiles, int dim, int samples, double eps) {
 }
 
 // main solve method to call
-char* solve_tetravex(Tile* tiles, int dim) {
-    // reset
+char* solve_tetravex(Tile* tiles, const int dim) {
+    // reset global variable counter
     positions_scanned = 0;
 
     srand(time(NULL));
-    int total = dim * dim;
+    const int total = dim * dim;
 
     Tile* current = malloc(sizeof(Tile) * total);
     memcpy(current, tiles, sizeof(Tile) * total);
@@ -124,7 +126,7 @@ char* solve_tetravex(Tile* tiles, int dim) {
         free(proposed);
     }
 
-    // Build result string
+    // build result string
     char* result = malloc(5 * total);  // "1234 " * total + '\0'
     result[0] = '\0';
 
@@ -135,9 +137,9 @@ char* solve_tetravex(Tile* tiles, int dim) {
         free(tile_str);
     }
     
+    // debug message
     printf("total positions scanned: %d\n", positions_scanned);
 
     free(current);
     return result;
 }
-

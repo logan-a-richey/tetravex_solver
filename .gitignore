@@ -1,6 +1,7 @@
 __pycache__
 venv
 golang_backend
+tests
 *.exe
 *.o
 *.gch
