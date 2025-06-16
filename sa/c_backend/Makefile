@@ -4,7 +4,7 @@ CFLAGS = -Wall -Wextra -O2
 LDFLAGS = -lm
 
 # Target executable
-TARGET = tetravex_solver
+TARGET = tetravex_solver.exe
 
 # Source files and object files
 SRCS = main.c solver.c tile.c
