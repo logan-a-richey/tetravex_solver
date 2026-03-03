@@ -5,12 +5,13 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
+#include <stdint.h>
 
 #include "tile.h"
 #include "solver.h"
 
 // keep track of number of positions scanned
-static int positions_scanned = 0;
+static uint64_t positions_scanned = 0;
 
 // cost: number of mismatches
 static int calculate_cost(Tile* t, int dim) {
@@ -138,7 +139,7 @@ char* solve_tetravex(Tile* tiles, const int dim) {
     }
     
     // debug message
-    printf("total positions scanned: %d\n", positions_scanned);
+    printf("total positions scanned: %ld\n", positions_scanned);
 
     free(current);
     return result;
